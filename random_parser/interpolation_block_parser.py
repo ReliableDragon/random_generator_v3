@@ -4,6 +4,7 @@ from typing import Dict, Iterable, Union
 
 from random_parser.base_parser import BaseParser
 from random_parser.choice_block_parser import ChoiceBlockParser
+from random_parser.constants import WEIGHTED_CHOICE_SEPARATOR, INTERPOLATION_BLOCK_END, INTERPOLATION_MARKER
 
 
 class InterpolationBlockParser(BaseParser):
@@ -60,7 +61,7 @@ class InterpolationBlockParser(BaseParser):
             logging.debug(f'{self.line_num}: {self.line()}')
 
             # The dollar sign indicated the end of a subchoice block.
-            if self.line() == '$':
+            if self.line() == INTERPOLATION_BLOCK_END:
                 self.use_line()
                 return self
 
@@ -70,9 +71,9 @@ class InterpolationBlockParser(BaseParser):
                 weight = choice_line
                 choice = ''
             else:
-                weight, choice = choice_line.split(' ', maxsplit=1)
+                weight, choice = choice_line.split(WEIGHTED_CHOICE_SEPARATOR, maxsplit=1)
 
-            if '$' in choice:
+            if INTERPOLATION_MARKER in choice:
                 choice = self.parse_nested_choice_block(choice)
 
             assert weight.isdecimal(), self.err_msg(f'Got invalid weight {weight}')

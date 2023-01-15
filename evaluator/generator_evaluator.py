@@ -40,6 +40,9 @@ class GeneratorEvaluator():
         generation = ''
         i = 0
         while i < choice_block.length():
+            # TODO: Have choice block put all elements into a single "fragments" list, then
+            # process on this side what to do with them. Maybe also consider a choice_expression
+            # parser, if choice_block is getting too unwieldy. 
             generation += choice_block.text_fragments[i]
             generation += self.evaluate_subchoice(choice_block.subchoices[i])
             i += 1

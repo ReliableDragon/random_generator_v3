@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Iterable, TYPE_CHECKING
 from random_parser.base_parser import BaseParser
+from random_parser.constants import GENERATOR_IMPORT_KEYWORD, IMPORT_DATA_SEPARATOR, IMPORT_LINE_SEPARATOR, RESOURCE_IMPORT_KEYWORD
 from random_parser.imports_cache import ImportsCache
 
 from random_parser.utils import generate_err_msg
@@ -17,9 +18,9 @@ class FileParser(BaseParser):
 
     def maybe_parse_imports(self):
         parsed_imports = False
-        while self.line().startswith('generator') or self.line().startswith('resource'):
-            import_type, import_data = self.use_line().split(' ')
-            import_handle, import_filename = import_data.split(':')
+        while self.line().startswith(GENERATOR_IMPORT_KEYWORD) or self.line().startswith(RESOURCE_IMPORT_KEYWORD):
+            import_type, import_data = self.use_line().split(IMPORT_LINE_SEPARATOR)
+            import_handle, import_filename = import_data.split(IMPORT_DATA_SEPARATOR)
             imports_parser = ImportsParser(import_filename, self.lines, self.line_num, self.imports_cache)
             imports_parser.parse(import_type, import_handle, import_filename)
             # Do not update line_num based on imports, as they are a different file.

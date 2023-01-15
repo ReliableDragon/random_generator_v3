@@ -2,6 +2,7 @@
 import os
 from typing import Iterable
 from random_parser.base_parser import BaseParser
+from random_parser.constants import GENERATOR_IMPORT_KEYWORD, RESOURCE_IMPORT_KEYWORD
 from random_parser.imports_cache import ImportsCache
 
 class ImportsParser(BaseParser):
@@ -15,8 +16,8 @@ class ImportsParser(BaseParser):
         if import_handle in self.imports_cache.imports:
             return self
 
-        assert import_type in ['generator', 'resource'], self.err_msg(f'Got invalid import_type "{import_type}"')
-        if import_type == 'generator':
+        assert import_type in [GENERATOR_IMPORT_KEYWORD, RESOURCE_IMPORT_KEYWORD], self.err_msg(f'Got invalid import_type "{import_type}"')
+        if import_type == GENERATOR_IMPORT_KEYWORD:
             folder = self.imports_cache.generator_folder
         else:
             folder = self.imports_cache.resources_folder
@@ -24,7 +25,7 @@ class ImportsParser(BaseParser):
         filepath = os.path.join(folder, import_filename)
         with open(filepath) as f:
             lines = f.read().split('\n')
-            if import_type == 'generator':
+            if import_type == GENERATOR_IMPORT_KEYWORD:
                 parser = generator_parser.GeneratorParser(self.filename, lines, 0, self)
             else:
                 parser = resource_parser.ResourceParser(self.filename, lines, 0, self)
