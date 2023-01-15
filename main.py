@@ -3,13 +3,14 @@ import logging
 import os
 import sys
 
-from generator.random_generator import RandomGenerator
-from parser.parser import Parser
+from evaluator.generator_evaluator import GeneratorEvaluator
+from random_parser.parser import Parser
 
 from typing import Any, Iterable, Optional, Union
 
 #  (:%(funcName)s)
 logging.basicConfig(format='> %(filename)s:%(lineno)d %(message)s', level=logging.INFO)
+logging.getLogger().setLevel(logging.WARNING)
 
 def parse_args() -> Iterable[Any]:
     parser = argparse.ArgumentParser(
@@ -20,7 +21,6 @@ def parse_args() -> Iterable[Any]:
     parser.add_argument('-g', '--generators', nargs='?')
     parser.add_argument('-i', '--inputs', nargs='?')
     args = parser.parse_args()
-    print(args)
     return args
 
 def get_choice() -> Union[int, str]:
@@ -34,9 +34,8 @@ def get_choice() -> Union[int, str]:
             return choice - 1
         except:
             pass
-    
 
-def repl(generator: RandomGenerator):
+def repl(generator: GeneratorEvaluator):
     while True:
         generations = generator.get_available_generations()
         for i, generation in enumerate(generations):
@@ -44,7 +43,7 @@ def repl(generator: RandomGenerator):
         choice = get_choice()
         if choice == 'exit':
             break
-        generated = generator.generate(choice)
+        generated = generator.evaluate(choice)
         print(generated)
 
 def run(args: argparse.Namespace) -> None:
@@ -52,12 +51,11 @@ def run(args: argparse.Namespace) -> None:
 
         Args:
         args: Parsed command line arguments."""
+        print('Running the random choice generator!')
         parser = Parser(args.generators, args.inputs)
         parser.parse(args.filter)
-        generator = RandomGenerator(parser)
+        generator = GeneratorEvaluator(parser)
         repl(generator)
-        
-        print(generator)
 
 
 if __name__ == '__main__':
