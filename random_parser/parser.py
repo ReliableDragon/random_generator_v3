@@ -1,8 +1,12 @@
+import logging
 import os
 
 from random_parser.generator_parser import GeneratorParser
 
 from typing import IO, Iterable, Optional, TextIO
+from random_parser.imports_cache import ImportsCache
+
+from random_parser.imports_parser import ImportsParser
 
 class Parser():
     """Parse files for random generation.
@@ -16,22 +20,23 @@ class Parser():
 
     generator_filter: str
     generators_folder: str
-    inputs_folder: str
+    resources_folder: str
 
     top_level_generators: Iterable[GeneratorParser]
 
     def __init__(self, generators_folder: str = None,
-                 inputs_folder: str = None):
-        self.generators_folder = generators_folder if generators_folder else r'top_level_generators/'
-        self.inputs_folder = inputs_folder if inputs_folder else r'inputs/'
+                 resources_folder: str = None):
+        self.generators_folder = generators_folder if generators_folder else r'generators/'
+        self.resources_folder = resources_folder if resources_folder else r'generators/resources/'
+        self.imports_cache = ImportsCache(self.generators_folder, self.resources_folder)
 
     def parse(self, generator_filter: str = None) -> None:
         self.parse_top_level_generators(generator_filter)
 
-    def parse_generator(self, f: TextIO, filepath: str, filename: str) -> str:
+    def parse_generator(self, f: TextIO, filename: str) -> str:
         lines = f.read().split('\n')
-        generator_parser = GeneratorParser(filename, lines, 0)
-        parsed_file = generator_parser.parse_generator()
+        generator_parser = GeneratorParser(filename, lines, 0, self.imports_cache)
+        parsed_file = generator_parser.parse()
         return parsed_file
 
     def parse_top_level_generators(self, generator_filter: Optional[str] = None) -> None:
@@ -43,6 +48,10 @@ class Parser():
                     continue
 
             filepath = os.path.join(self.generators_folder, filename)
+            # Skip non-file objects, such as folders.
+            if not os.path.isfile(filepath):
+                continue
+            logging.info(f'Opening generator file {filepath}.')
             with open(filepath) as f:
-                generator = self.parse_generator(f, filepath, filename)
+                generator = self.parse_generator(f, filename)
                 self.top_level_generators.append(generator)

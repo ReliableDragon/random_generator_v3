@@ -10,7 +10,6 @@ from typing import Any, Iterable, Optional, Union
 
 #  (:%(funcName)s)
 logging.basicConfig(format='> %(filename)s:%(lineno)d %(message)s', level=logging.INFO)
-logging.getLogger().setLevel(logging.WARNING)
 
 def parse_args() -> Iterable[Any]:
     parser = argparse.ArgumentParser(
@@ -20,6 +19,8 @@ def parse_args() -> Iterable[Any]:
     parser.add_argument('-f', '--filter', nargs='?')
     parser.add_argument('-g', '--generators', nargs='?')
     parser.add_argument('-i', '--inputs', nargs='?')
+    parser.add_argument('--info', action='store_true')
+    parser.add_argument('--debug', action='store_true')
     args = parser.parse_args()
     return args
 
@@ -60,4 +61,13 @@ def run(args: argparse.Namespace) -> None:
 
 if __name__ == '__main__':
     args = parse_args()
+    logger = logging.getLogger()
+    
+    if args.debug:
+        logging.getLogger().setLevel(logging.DEBUG)
+    elif args.info:
+        logging.getLogger().setLevel(logging.INFO)
+    else:
+        logger.setLevel(logging.WARNING)
+
     run(args)

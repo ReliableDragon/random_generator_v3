@@ -18,7 +18,13 @@ choice.
 
 # Formal Syntax
 ```
-<GENERATOR> ::= <NAME> <NEWLINE> <CHOICE_BLOCK>
+<GENERATOR> ::= <HEADER> <CHOICE_BLOCK>
+<RESOURCE> ::= <HEADER> <INTERPOLATION_BLOCK>
+<HEADER> ::= <NAME> <NEWLINE> <IMPORTS> <NEWLINE>  ; i.e. there's a blank line between each section
+<IMPORTS> ::= *(<IMPORT> <NEWLINE>)
+<IMPORT> ::= ("resource" | "generator") <SPACE> <HANDLE> ":" <FILENAME>
+<HANDLE> ::= "[a-zA-Z_]"
+<FILENAME> ::= "[a-zA-Z_-.]"
 <NAME> ::= <TEXT_LINE>
 
 <CHOICE_BLOCK> ::= <CHOICE_EXPRESSION> <NEWLINE> <INTERPOLATION_BLOCKS>
@@ -32,7 +38,7 @@ choice.
 <INTERPOLATION_BLOCK_END> ::= <PADDING> "$"
 
 <TEXT_LINE> ::= <TEXT> <NEWLINE>
-<TEXT> ::= <REGEX [^\n]>  ; No newlines. Not sure how to write that concisely in BNF.
+<TEXT> ::= "[^\n]"  ; No newlines. Not sure how to write that concisely in BNF.
 <NEWLINE> ::= "\n"
 <PADDING> ::= *" "  ; Convention is 4 spaces for each level of nesting.
 <INTEGER> ::= 1*[1234567890]

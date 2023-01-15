@@ -1,0 +1,7 @@
+A generator to test import mechanics
+
+resource resources:test.resources
+
+My best resource is my @resource. $
+    10 REMOVE
+    $
