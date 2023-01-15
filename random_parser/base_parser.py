@@ -20,9 +20,9 @@ class BaseParser():
 
     def line(self):
         try:
-            return self.lines[self.line_num].strip()
+            return self.lines[self.line_num].lstrip()
         except IndexError as e:
-            logging.error(f'{self.filename}, line {self.line_num+1}> Attempted to consume line past end of file!')
+            logging.error(f'{self._msg_intro()} Attempted to consume line past end of file!')
             raise e
 
     def use_line(self):
@@ -38,4 +38,7 @@ class BaseParser():
             line_contents = '<EOF>'
         else:
             line_contents = self.line()
-        return f'{self.filename}, line {self.line_num+1}> {msg}: "{line_contents}"'
+        return f'{self._msg_intro()} {msg}: "{line_contents}"'
+
+    def _msg_intro(self):
+        return f'{self.__class__.__name__}, file {self.filename}, line {self.line_num+1}>'

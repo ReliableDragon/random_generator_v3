@@ -2,10 +2,11 @@ import os
 import random
 
 from typing import IO, Iterable, Optional, TextIO
-from evaluator.subchoice_evaluator import SubchoiceEvaluator
+from evaluator.interpolation_block_evaluator import InterpolationBlockEvaluator
+from random_parser.choice_block_parser import ChoiceBlockParser
 
 from random_parser.parser import Parser
-from random_parser.subchoice_parser import SubchoiceParser
+from random_parser.interpolation_block_parser import InterpolationBlockParser
 
 class GeneratorEvaluator():
     """Generates randomness!
@@ -24,17 +25,24 @@ class GeneratorEvaluator():
         else:
             return [generator_filter] if generator_filter in self.parser.top_level_generators else []
 
-    def evaluate_subchoice(self, subchoice: SubchoiceParser):
-        return SubchoiceEvaluator.randomly_generate_subchoice(subchoice)
+    def evaluate_subchoice(self, subchoice: InterpolationBlockParser):
+        choice = InterpolationBlockEvaluator.randomly_generate_weighted_choice(subchoice)
+        if isinstance(choice, str):
+            return choice
+        else:
+            return self.evaluate_choice_block(choice)
 
     def evaluate(self, choice: int = 0) -> str:
-        choice_body = self.parser.top_level_generators[choice].get_body()
+        choice_block = self.parser.top_level_generators[choice].choice_block
+        return self.evaluate_choice_block(choice_block)
+
+    def evaluate_choice_block(self, choice_block: ChoiceBlockParser):
         generation = ''
         i = 0
-        while i < choice_body.length():
-            generation += choice_body.text_fragments[i]
-            generation += self.evaluate_subchoice(choice_body.subchoices[i])
+        while i < choice_block.length():
+            generation += choice_block.text_fragments[i]
+            generation += self.evaluate_subchoice(choice_block.subchoices[i])
             i += 1
 
-        generation += choice_body.text_fragments[i]
+        generation += choice_block.text_fragments[i]
         return generation

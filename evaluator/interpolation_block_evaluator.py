@@ -2,9 +2,9 @@
 import random
 
 
-class SubchoiceEvaluator():
+class InterpolationBlockEvaluator():
 
-    def randomly_generate_subchoice(subchoice):
+    def randomly_generate_weighted_choice(subchoice):
         total_weight = sum(subchoice.weights)
         threshold = random.randint(1, total_weight)
         i = -1  # Start at -1 to ensure loop condition evaluates properly at i=0.

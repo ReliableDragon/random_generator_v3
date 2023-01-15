@@ -1,0 +1,19 @@
+Nested Generator Test
+
+I am a $ generator!
+    10 $ nested
+        100 $deeply
+            10 very 
+            10 quite 
+            10
+            $
+        10 shallowly
+        $
+    10 $ kooky
+        10 $ deeply
+            10 very
+            10 quite
+            $
+        10 shallowly
+        $
+    $
