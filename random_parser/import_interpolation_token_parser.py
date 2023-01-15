@@ -4,13 +4,13 @@ import logging
 from typing import TYPE_CHECKING, Iterable
 from random_parser.constants import IMPORT_INTERPOLATION_MARKER, IMPORT_ITPL_CLOSE_DELIMITER, IMPORT_ITPL_END, IMPORT_ITPL_OPEN_DELIMITER
 
-from random_parser.symbol_parser import SymbolParser
+from random_parser.token_parser import TokenParser
 
 
-class ImportInterpolationSymbolParser(SymbolParser):
+class ImportInterpolationTokenParser(TokenParser):
 
-    def __init__(self, filename: str, lines: Iterable[str], line_num: int, expression: str, char_num: int):
-        super().__init__(filename, lines, line_num, expression, char_num)
+    def __init__(self, filename: str, lines: Iterable[str], line_num: int, expression: str, char_num: int, token_num: int):
+        super().__init__(filename, lines, line_num, expression, char_num, token_num)
         self.import_handle = None
 
     def parse(self):

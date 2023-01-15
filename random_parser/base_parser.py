@@ -18,6 +18,13 @@ class BaseParser():
         self.lines = lines
         self.line_num = line_num
 
+    def print(self, indent = 0):
+        rep = ''
+        rep += ' ' * indent + 'filename: ' + self.filename + '\n'
+        rep += ' ' * indent + 'line_num: ' + str(self.line_num) + '\n'
+        rep += ' ' * indent + 'lines:' + '\n' + '\n'.join([' ' * indent + str(l) for l in self.lines]) + '\n'
+        return rep
+
     def line(self):
         try:
             return self.lines[self.line_num].lstrip()
@@ -29,6 +36,9 @@ class BaseParser():
         line = self.line()
         self.line_num += 1
         return line
+
+    def get_line_num(self):
+        return self.line_num + 1  # 0-indexing vs 1-indexing my beloathed
 
     def is_finished(self):
         return self.line_num == len(self.lines)

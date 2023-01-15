@@ -2,6 +2,7 @@ A generator to test import mechanics
 
 resource resources:test.resources
 
-My best resource is my @resource. $
-    10 REMOVE
+My best resources are my @resources and my @{resources}. $?
+    10 See
+    10 Got it
     $

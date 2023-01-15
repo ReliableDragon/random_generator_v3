@@ -2,7 +2,7 @@
 import os
 from typing import Iterable
 from random_parser.base_parser import BaseParser
-from random_parser.constants import GENERATOR_IMPORT_KEYWORD, RESOURCE_IMPORT_KEYWORD
+from random_parser.constants import GENERATOR_IMPORT_KEYWORD, GENERATOR_PARSER, RESOURCE_IMPORT_KEYWORD, RESOURCE_PARSER
 from random_parser.imports_cache import ImportsCache
 
 class ImportsParser(BaseParser):
@@ -27,10 +27,12 @@ class ImportsParser(BaseParser):
             lines = f.read().split('\n')
             if import_type == GENERATOR_IMPORT_KEYWORD:
                 parser = generator_parser.GeneratorParser(self.filename, lines, 0, self)
+                parser_type =  GENERATOR_PARSER
             else:
                 parser = resource_parser.ResourceParser(self.filename, lines, 0, self)
+                parser_type =  RESOURCE_PARSER
             parser.parse()
-            self.imports_cache.imports[import_handle] = parser
+            self.imports_cache.store(import_handle, parser_type, parser)
         
         return self
 

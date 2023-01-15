@@ -2,10 +2,10 @@ Nested Generator Test
 
 I am a $ generator!
     10 $ nested
-        100 $deeply
+        50 $deeply
             10 very 
             10 quite 
-            10
+            20
             $
         10 shallowly
         $

@@ -4,20 +4,28 @@ from typing import Iterable
 
 
 from random_parser.base_parser import BaseParser
-from random_parser.constants import IMPORT_INTERPOLATION_MARKER, INTERPOLATION_MARKER
-from random_parser.import_interpolation_symbol_parser import ImportInterpolationSymbolParser
+from random_parser.choice_expression_parser import ChoiceExpressionParser
 
 
 class ChoiceBlockParser(BaseParser):
 
     def __init__(self, filename: str, lines: Iterable[str], line_num: int):
         super().__init__(filename, lines, line_num)
-        self.text_fragments = []
-        self.subchoices = []
+        self.choice_expression_parser = None  # ChoiceExpressionParser
+        self.interpolation_blocks = []  # Iterable[InterpolationBlockParser]
+
+    def print(self, indent = 0, top_level = False):
+        rep = ''
+        if top_level:
+            rep += super().print(indent)
+        rep += ' ' * indent + 'expression_parser: ' + self.choice_expression_parser.print(indent + 4) + '\n'
+        rep += ' ' * indent + 'interpolation_blocks:' + '\n' + '\n'.join([' ' * indent + l.print(indent + 4) for l in self.interpolation_blocks]) + '\n'
+        return rep
 
     def parse(self):
         assert self.line(), self.err_msg('Empty choice body')
-        choice_expression = self.use_line()
+        choice_expression = self.line()  # Choice expressions end with \n currently, but this
+                                             # could need to be reworked in the future.
         self._parse(choice_expression)
 
         return self
@@ -29,35 +37,23 @@ class ChoiceBlockParser(BaseParser):
 
     def _parse(self, choice_expression: str):
         logging.debug(f'Processing choice expression "{choice_expression}"')
-        self.text_fragments = re.split(
-            rf'[{INTERPOLATION_MARKER}{IMPORT_INTERPOLATION_MARKER}]', choice_expression)
-        
-        num_fragments = len(self.text_fragments) - 1  # Subtract one to avoid a fencepost error.
-        markers = [INTERPOLATION_MARKER, IMPORT_INTERPOLATION_MARKER]
-        marker_indexes = [i for i, c in enumerate(choice_expression) if c in markers]
+        self.choice_expression_parser = ChoiceExpressionParser(self.filename, self.lines, self.line_num, choice_expression)
+        self.choice_expression_parser.parse()
+        self.line_num = self.choice_expression_parser.line_num
 
-        fragment_num = 1
-        for i in marker_indexes:
-            c = choice_expression[i]
-            logging.info(f'Parsing interpolation marker {c} for fragment #{fragment_num} of {num_fragments}')
-            if c == INTERPOLATION_MARKER:
-                subchoice = interpolation_block_parser.InterpolationBlockParser(
-                    self.filename, self.lines, self.line_num, fragment_num, choice_expression)
-                subchoice.parse()
-                self.subchoices.append(subchoice)
-                self.line_num = subchoice.line_num
-            elif c == IMPORT_INTERPOLATION_MARKER:
-                subchoice = ImportInterpolationSymbolParser(
-                    self.filename, self.lines, self.line_num, choice_expression, i)
-                subchoice.parse()
-                self.subchoices.append(subchoice)
-                self.line_num = subchoice.line_num
-            fragment_num += 1
-            logging.info(f'Finished parsing fragment: {subchoice}')
+        num_itpl_fragments = self.choice_expression_parser.num_interpolation_fragments
+        for block_num in range(1, num_itpl_fragments+1):  # Add 1 for 1-indexing
+            logging.info(f'Parsing interpolation at index #{block_num} of {num_itpl_fragments}')
+            interpolation_block = interpolation_block_parser.InterpolationBlockParser(
+                self.filename, self.lines, self.line_num, block_num, choice_expression)
+            interpolation_block.parse()
+            self.interpolation_blocks.append(interpolation_block)
+            self.line_num = interpolation_block.line_num
+            logging.info(f'Finished parsing fragment: {interpolation_block}')
 
 
     def length(self):
-        return len(self.subchoices)
+        return len(self.interpolation_blocks)
 
 
 # Delay import to prevent circular dependencies.
