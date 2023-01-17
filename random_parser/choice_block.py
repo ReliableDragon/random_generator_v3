@@ -4,13 +4,9 @@ from typing import Iterable
 
 
 from random_parser.base_parser import BaseParser
-from random_parser.choice_expression_parser import ChoiceExpressionParser
-from random_parser.choice_marker_parser import ChoiceMarkerParser
+from random_parser.choice_expression import ChoiceExpressionParser
 from random_parser.constants import GENERATOR_PARSER, RESOURCE_PARSER
 from random_parser.context import Context
-from random_parser.text_fragment_parser import TextFragmentParser
-from random_parser.import_interpolation_token_parser import ImportInterpolationTokenParser
-from random_parser.interpolation_token_parser import InterpolationTokenParser
 
 
 class ChoiceBlockParser(BaseParser):
@@ -44,7 +40,7 @@ class ChoiceBlockParser(BaseParser):
         num_itpl_fragments = self.choice_expression_parser.num_interpolation_fragments()
         for block_num in range(1, num_itpl_fragments+1):  # Add 1 for 1-indexing
             logging.info(f'Parsing interpolation block index #{block_num} of {num_itpl_fragments}')
-            interpolation_block = interpolation_block_parser.InterpolationBlockParser(
+            interpolation_block = ibp.InterpolationBlockParser(
                 self, block_num, self.line()[char_num:])
             interpolation_block.parse()
             self.interpolation_blocks.append(interpolation_block)
@@ -57,4 +53,4 @@ class ChoiceBlockParser(BaseParser):
 
 
 # Delay import to prevent circular dependencies.
-import random_parser.interpolation_block_parser as interpolation_block_parser
+import random_parser.interpolation_block as ibp

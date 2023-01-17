@@ -3,11 +3,10 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Dict, Iterable
 from random_parser.context import Context
-from random_parser.import_interpolation_token_parser import ImportInterpolationTokenParser
+from random_parser.import_interpolation import ImportInterpolationTokenParser
 from random_parser.constants import GENERATOR_PARSER, IMPORT_INTERPOLATION_MARKER, INTERPOLATION_MARKER, RESOURCE_PARSER
-from random_parser.interpolation_token_parser import InterpolationTokenParser
+from random_parser.interpolation_token import InterpolationTokenParser
 from random_parser.token_parser import TokenParser
-from random_parser.base_parser import BaseParser
 
 
 class ChoiceMarkerParser(TokenParser):
@@ -44,4 +43,4 @@ class ChoiceMarkerParser(TokenParser):
         return self
 
 if TYPE_CHECKING:
-    from random_parser.interpolation_block_parser import InterpolationBlockParser
+    from random_parser.interpolation_block import InterpolationBlockParser

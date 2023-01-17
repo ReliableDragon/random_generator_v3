@@ -26,10 +26,10 @@ class ImportsParser(BaseParser):
         with open(filepath) as f:
             lines = f.read().split('\n')
             if import_type == GENERATOR_IMPORT_KEYWORD:
-                parser = generator_parser.GeneratorParser(self.filename, lines, 0, self.imports_cache)
+                parser = generator.GeneratorParser(self.filename, lines, 0, self.imports_cache)
                 parser_type =  GENERATOR_PARSER
             else:
-                parser = resource_parser.ResourceParser(self.filename, lines, 0, self.imports_cache)
+                parser = resource.ResourceParser(self.filename, lines, 0, self.imports_cache)
                 parser_type =  RESOURCE_PARSER
             parser.parse()
             self.imports_cache.store(import_handle, parser_type, parser)
@@ -37,5 +37,5 @@ class ImportsParser(BaseParser):
         return self
 
 # Can't use "from x import y", or a circular dependency ensues.
-import random_parser.resource_parser as resource_parser
-import random_parser.generator_parser as generator_parser
+import random_parser.resource as resource
+import random_parser.generator as generator

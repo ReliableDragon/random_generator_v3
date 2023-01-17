@@ -42,7 +42,8 @@ choice.
 
 <INTERPOLATION_BLOCKS> ::= N*(<INTERPOLATION_BLOCK>)  ; N equals the number of <INTERPOLATION_MARKER> in the <CHOICE_EXPRESSION>.
 <INTERPOLATION_BLOCK> ::= *(<WEIGHTED_CHOICE>) <INTERPOLATION_BLOCK_END>
-<WEIGHTED_CHOICE> ::= <INTEGER> [<SPACE> <WEIGHTED_CHOICE_VALUE>] <NEWLINE>; Empty choices are allowed.
+<WEIGHTED_CHOICE> ::= <WEIGHT> [<SPACE> <WEIGHTED_CHOICE_VALUE>] <NEWLINE>; Empty choices are allowed.
+<WEIGHT> ::= <INTEGER> | "[" <INT_COMMAND> "]"  ; Consider allowing full expression later
 <WEIGHTED_CHOICE_VALUE> ::= (<TEXT> | <CHOICE_BLOCK>)
 <INTERPOLATION_BLOCK_END> ::= "$" <NEWLINE>
 
@@ -53,13 +54,13 @@ choice.
 <INTEGER> ::= 1*[1234567890]
 <SPACE> ::= " "
 
-<COMMAND_EXPRESSION> ::= "#" "(" 1*<COMMAND> ")"  ; Possibly add <COMMAND_MARKER> <SIMPLE_COMMAND>  form later.
-<COMMAND> ::= <FUNCTION>
-<FUNCTION> ::= <COMMAND_NAME> "(" *(<ARGUMENT> ",") [<ARGUMENT>] ")"
+<COMMAND_EXPRESSION> ::= "#" "(" 1*(<INT_COMMAND> | <STR_COMMAND>) ")" ; Possibly add <COMMAND_MARKER> <SIMPLE_COMMAND>  form later.
+<INT_COMMAND_EXPRESSION> ::= "#" "(" 1*<INT_COMMAND> ")"
+<STR_COMMAND_EXPRESSION> ::= "#" "(" 1*<STR_COMMAND> ")"
+<INT_COMMAND> ::= <INT_COMMAND_NAME> <ARGUMENTS>
+<STR_COMMAND> ::= <STR_COMMAND_NAME> <ARGUMENTS>
+<ARGUMENTS> ::= "(" *(<ARGUMENT> ",") [<ARGUMENT>] ")"
 <ARGUMENT> ::= [a-zA-Z0-9] | <COMMAND>
-<COMMAND_NAME> ::= "gauss" | "normal" | "random"
-; Test $ demo
-;   10 #(gauss(4, 5))one
-;   10 #gauss(4, 5) two
-;   10 @[#gauss(4, 5)]three
+<INT_COMMAND_NAME> ::= "iconstant" | "random"
+<STR_COMMAND_NAME> ::= "constant" | "cow"
 ```

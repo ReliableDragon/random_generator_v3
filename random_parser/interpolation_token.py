@@ -4,7 +4,6 @@ import logging
 from typing import TYPE_CHECKING, Iterable
 from random_parser.constants import INTERPOLATION_MARKER
 from random_parser.token_parser import TokenParser
-from random_parser.base_parser import BaseParser
 
 
 class InterpolationTokenParser(TokenParser):

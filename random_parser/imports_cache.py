@@ -10,7 +10,7 @@ class ImportsCache():
     class Import():
         import_handle: str
         parser_type: str
-        parser: Union['generator_parser.GeneratorParser', 'resource_parser.ResourceParser']
+        parser: Union['generator.GeneratorParser', 'resource.ResourceParser']
 
     def __init__(self, generator_folder: str, resources_folder: str):
         self.generator_folder = generator_folder
@@ -27,5 +27,5 @@ class ImportsCache():
         return [i.import_handle for i in self.imports.values()]
 
 if TYPE_CHECKING:
-    import random_parser.generator_parser as generator_parser
-    import random_parser.resource_parser as resource_parser
+    import random_parser.generator as generator
+    import random_parser.resource as resource

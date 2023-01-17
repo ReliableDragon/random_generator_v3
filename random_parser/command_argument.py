@@ -21,6 +21,28 @@ class CommandArgumentParser(TokenParser):
         else:
             raise ValueError(f'Got invalid argument: {self.argument}')
 
+    def get_type(self):
+        if isinstance(self.argument, str):
+            return str
+        elif isinstance(self.argument, CommandParser):
+            return self.argument.get_type()
+
+    def is_int(self):
+        if isinstance(self.argument, str):
+            try:
+                int(self.argument)
+                return True
+            except ValueError:
+                return False
+        elif isinstance(self.argument, CommandParser):
+            return self.argument.get_type() == int
+
+    def is_str(self):
+        if isinstance(self.argument, str):
+            return True
+        elif isinstance(self.argument, CommandParser):
+            return self.argument.get_type() == str
+
     def parse_nested_command(self, command):
         self.argument = CommandParser(self)
         self.argument.parse_nested(command)
@@ -52,4 +74,4 @@ class CommandArgumentParser(TokenParser):
         return self
 
         
-from random_parser.command_parser import CommandParser
+from random_parser.command import CommandParser

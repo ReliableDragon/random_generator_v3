@@ -7,7 +7,7 @@ from random_parser.utils import generate_err_msg
 
 from random_parser.file_parser import FileParser
 from random_parser.imports_cache import ImportsCache
-from random_parser.interpolation_block_parser import InterpolationBlockParser
+from random_parser.interpolation_block import InterpolationBlockParser
 
 
 class ResourceParser(FileParser):

@@ -50,5 +50,5 @@ class FileParser(BaseParser):
     def parse(self):
         self.parse_header()
 
-from random_parser.imports_parser import ImportsParser
+from random_parser.imports import ImportsParser
 from random_parser.imports_cache import ImportsCache

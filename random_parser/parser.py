@@ -2,12 +2,10 @@ import logging
 import os
 from random_parser.context import Context
 
-from random_parser.generator_parser import GeneratorParser
+from random_parser.generator import GeneratorParser
 
 from typing import IO, Iterable, Optional, TextIO
 from random_parser.imports_cache import ImportsCache
-
-from random_parser.imports_parser import ImportsParser
 
 class Parser():
     """Parse files for random generation.

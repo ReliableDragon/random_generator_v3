@@ -3,7 +3,6 @@ import logging
 import os
 import sys
 
-from evaluator.generator_evaluator import GeneratorEvaluator
 from random_parser.parser import Parser
 
 from typing import Any, Iterable, Optional, Union
