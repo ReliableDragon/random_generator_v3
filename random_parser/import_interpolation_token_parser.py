@@ -26,6 +26,7 @@ class ImportInterpolationTokenParser(TokenParser):
             self.use_char()
             return self
         else:
+            # Don't consume following space
             while self.char() != IMPORT_ITPL_END:
                 self.import_handle += self.use_char()
             return self

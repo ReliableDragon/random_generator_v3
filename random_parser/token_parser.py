@@ -24,3 +24,9 @@ class TokenParser(BaseParser):
 
     def get_char_num(self):
         return self.char_num + 1
+
+    def is_eol(self):
+        return self.char_num == len(self.expression)
+
+    def _msg_intro(self):
+        return f'{self.__class__.__name__}, file {self.filename}, line {self.get_line_num()}, char {self.get_char_num()}, token #{self.token_num}>'

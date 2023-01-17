@@ -33,8 +33,7 @@ class Parser():
     def parse(self, generator_filter: str = None) -> None:
         self.parse_top_level_generators(generator_filter)
 
-    def parse_generator(self, f: TextIO, filename: str) -> str:
-        lines = f.read().split('\n')
+    def parse_generator(self, f: TextIO, filename: str, lines: Iterable[str]) -> str:
         generator_parser = GeneratorParser(filename, lines, 0, self.imports_cache)
         parsed_file = generator_parser.parse()
         return parsed_file
@@ -44,7 +43,7 @@ class Parser():
         for filename in os.listdir(self.generators_folder):
             # Skip any generators that don't match the filter.
             if generator_filter:
-                if filename.split('.')[0] != generator_filter:
+                if generator_filter not in filename:
                     continue
 
             filepath = os.path.join(self.generators_folder, filename)
@@ -53,5 +52,8 @@ class Parser():
                 continue
             logging.info(f'Opening generator file {filepath}.')
             with open(filepath) as f:
-                generator = self.parse_generator(f, filename)
+                lines = f.read().split('\n')
+                # Remove comments
+                lines = [line.split(';')[0] for line in lines]
+                generator = self.parse_generator(f, filename, lines)
                 self.top_level_generators.append(generator)

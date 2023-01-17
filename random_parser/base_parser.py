@@ -13,6 +13,7 @@ class BaseParser():
     lines: List containing all the lines to process.
     line_num: 0-indexed line number that is currently being processed."""
 
+    # TODO: Add init from another BaseParser.
     def __init__(self, filename: str, lines: Iterable[str], line_num: int):
         self.filename = filename
         self.lines = lines

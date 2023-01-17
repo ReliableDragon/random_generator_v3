@@ -24,15 +24,18 @@ def parse_args() -> Iterable[Any]:
     args = parser.parse_args()
     return args
 
-def get_choice() -> Union[int, str]:
+def get_choice(length) -> Union[int, str]:
     """Gets the 0-indexed choice of item to generate."""
     while True:
         choice = input('Choose an item to generate: ')
         if choice.lower().startswith('exit'):
             return 'exit'
         try:
-            choice = int(choice)
-            return choice - 1
+            choice = int(choice) - 1  # Subtract 1 as users use 1-indexed values
+            if choice >= length:
+                print('Invalid choice!')
+                continue
+            return choice
         except:
             pass
 
@@ -40,12 +43,12 @@ def repl(generator: GeneratorEvaluator):
     while True:
         generations = generator.get_available_generations()
         for i, generation in enumerate(generations):
-            print(f'{i+1}: {generation}')
-        choice = get_choice()
+            print(f'{i+1}: {generation}')  # Add 1 so users see 1-indexed values
+        choice = get_choice(len(generations))
         if choice == 'exit':
             break
         generated = generator.evaluate(choice)
-        print(generated)
+        print(generated + '\n\n')
 
 def run(args: argparse.Namespace) -> None:
         """Runs the generator.
