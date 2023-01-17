@@ -17,7 +17,7 @@ class CommandExpressionParser(TokenParser):
 
     def evaluate(self, context: Context):
         logging.info(f'Evaluating command expression {self})')
-        return self.command.evaluate(context)
+        return str(self.command.evaluate(context))  # Convert to string context
 
     # TODO: Add repeated command capabilities by switching to an array of command
     # fragments, so that things like arithemetic can be done.

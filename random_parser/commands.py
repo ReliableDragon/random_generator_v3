@@ -24,12 +24,17 @@ class Commands():
             self.arg_types = arg_types
             self.type = rtype
             self.evaluate = self.make_evaluator(evaluator)
+            # Cache results to avoid errors when evaluated multiple times e.g. during weight evaluation
+            self.result = None  
 
         def make_evaluator(self, evaluator):
             def evaluate(args):
+                if self.result is not None:
+                    return self.result
                 logging.debug(f'Evaluating function {self.name} with args {args}')
                 args = list(map(lambda t, a: t(a), self.arg_types, args))
                 result = evaluator(args)
+                self.result = result
                 return self.type(result)
             return evaluate
 

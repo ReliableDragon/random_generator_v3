@@ -5,14 +5,18 @@ from random_parser.context import Context
 from random_parser.token_parser import TokenParser
 from random_parser.base_parser import BaseParser
 from random_parser.weighted_choice_value import WeightedChoiceValueParser
+from random_parser.weighted_choice_weight import WeightedChoiceWeightParser
 
 
 class WeightedChoiceParser(TokenParser):
 
     def __init__(self, parser: BaseParser, char_num: int, token_num: int):
         super().__init__(base_parser=parser, char_num=char_num, token_num=token_num)
-        self.weight = None  # int
+        self.weight = None  # WeightedChoiceWeightParser
         self.choice_value = None # WeightedChoiceValueParser
+
+    def get_weight(self, context: Context):
+        return self.weight.get_weight(context)
 
     def evaluate(self, context: Context):
         raise NotImplemented('Attemped to evaluate data-only parser!')
@@ -24,11 +28,10 @@ class WeightedChoiceParser(TokenParser):
     def parse(self):
         # Technically this should be done by character since this is a token parser,
         # but right now this one is simple enough that we'll cheat and use the line.
-        token = ''
-        while not self.is_eol() and self.char() != WEIGHTED_CHOICE_SEPARATOR:
-            token += self.use_char()
-        assert token.isdecimal(), self.err_msg(f'Got invalid weight "{token}"')
-        self.weight = int(token)
+        self.weight = WeightedChoiceWeightParser(self)
+        self.weight.parse()
+        self.sync(self.weight)
+
         if not self.is_eol():
             self.use_char()  # Consume trailing space.
         

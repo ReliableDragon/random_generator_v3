@@ -34,20 +34,20 @@ class InterpolationBlockParser(BaseParser):
         # TODO: Actually code this.
         return str(self.parent_choice_expression)
 
-    def randomly_generate_weighted_choice(self) -> WeightedChoiceValueParser:
-        total_weight= sum([wc.weight for wc in self.weighted_choices])
+    def randomly_generate_weighted_choice(self, context) -> WeightedChoiceValueParser:
+        total_weight= sum([wc.get_weight(context) for wc in self.weighted_choices])
         threshold= random.randint(1, total_weight)
         i= -1  # Start at -1 to ensure loop condition evaluates properly at i=0.
         weight_sum = 0
         while weight_sum < threshold:
             i += 1
-            weight_sum += self.weighted_choices[i].weight
+            weight_sum += self.weighted_choices[i].get_weight(context)
         choice = self.weighted_choices[i].choice_value
         return choice
 
     def evaluate(self, context: Context):
         logging.debug(f'Evaluating interpolation block {self}')
-        return self.randomly_generate_weighted_choice().evaluate(context)
+        return self.randomly_generate_weighted_choice(context).evaluate(context)
 
     def has_choice_expression(self):
         return self.parent_choice_expression is not None

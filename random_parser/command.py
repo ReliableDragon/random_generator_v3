@@ -24,7 +24,7 @@ class CommandParser(TokenParser):
         evaluated_arguments = []
         for argument in self.arguments:
             evaluated_arguments.append(argument.evaluate(context))
-        return str(self.command.evaluate(evaluated_arguments))
+        return self.command.evaluate(evaluated_arguments)
 
     def validate_types(self):
         assert len(self.arguments) == len(self.command.arg_types), self.err_msg(

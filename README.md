@@ -43,24 +43,37 @@ choice.
 <INTERPOLATION_BLOCKS> ::= N*(<INTERPOLATION_BLOCK>)  ; N equals the number of <INTERPOLATION_MARKER> in the <CHOICE_EXPRESSION>.
 <INTERPOLATION_BLOCK> ::= *(<WEIGHTED_CHOICE>) <INTERPOLATION_BLOCK_END>
 <WEIGHTED_CHOICE> ::= <WEIGHT> [<SPACE> <WEIGHTED_CHOICE_VALUE>] <NEWLINE>; Empty choices are allowed.
-<WEIGHT> ::= <INTEGER> | "[" <INT_COMMAND> "]"  ; Consider allowing full expression later
+<WEIGHT> ::= <INTEGER> | "[" <INT_COMMAND_EXPRESSION> "]"  ; Consider allowing full expression later
 <WEIGHTED_CHOICE_VALUE> ::= (<TEXT> | <CHOICE_BLOCK>)
 <INTERPOLATION_BLOCK_END> ::= "$" <NEWLINE>
 
 <RAW_TEXT_LINE> ::= <RAW_TEXT> <NEWLINE>
-<TEXT> ::=  1*([<RAW_TEXT>] <COMMAND_EXPRESSION>) [<RAW_TEXT>] | <RAW_TEXT>
+<TEXT> ::=  1*([<RAW_TEXT>] <COMMAND_INTERPOLATION>) [<RAW_TEXT>] | <RAW_TEXT>
 <RAW_TEXT> ::= "[^\n$@#]"
 <NEWLINE> ::= "\n"
 <INTEGER> ::= 1*[1234567890]
 <SPACE> ::= " "
 
-<COMMAND_EXPRESSION> ::= "#" "(" 1*(<INT_COMMAND> | <STR_COMMAND>) ")" ; Possibly add <COMMAND_MARKER> <SIMPLE_COMMAND>  form later.
-<INT_COMMAND_EXPRESSION> ::= "#" "(" 1*<INT_COMMAND> ")"
-<STR_COMMAND_EXPRESSION> ::= "#" "(" 1*<STR_COMMAND> ")"
+; TODO: Support new command syntax to allow expressions and constants. This will require renaming
+; the command_expression class to command_interpolation, adding support for expressions and
+; constants, and getting it implemented in weighted choice weights as well as command 
+; interpolations.
+<COMMAND_INTERPOLATION> ::= "#" "(" 1*(<COMMAND_EXPRESSION>) ")" ; Possibly add <COMMAND_MARKER> <SIMPLE_COMMAND>  form later.
+<COMMAND_EXPRESSION> ::= <INT_COMMAND_EXPRESSION> | <STR_COMMAND_EXPRESSION>
+<INT_COMMAND_EXPRESSION> ::= 1*<INT_COMMAND> *(<INT_OP> <INT_COMMAND>)
+<STR_COMMAND_EXPRESSION> ::= 1*<STR_COMMAND> *(<STR_OP> <STR_COMMAND>)
+<INT_VAL> ::= <INT_COMMAND> | <CONST_INT>
+<STR_VAL> ::= <STR_COMMAND> | <CONST_STR>
+<COMMAND> ::= <INT_COMMAND> | <STR_COMMAND>
 <INT_COMMAND> ::= <INT_COMMAND_NAME> <ARGUMENTS>
 <STR_COMMAND> ::= <STR_COMMAND_NAME> <ARGUMENTS>
 <ARGUMENTS> ::= "(" *(<ARGUMENT> ",") [<ARGUMENT>] ")"
-<ARGUMENT> ::= [a-zA-Z0-9] | <COMMAND>
-<INT_COMMAND_NAME> ::= "iconstant" | "random"
+<ARGUMENT> ::= [a-zA-Z0-9] | <COMMAND_EXPRESSION>
+<INT_COMMAND_NAME> ::= "iconstant" | "random"  ; See commands.py for all, not listing them here.
 <STR_COMMAND_NAME> ::= "constant" | "cow"
+<INT_OP> ::= "+" | "-" | "/" | "*" | "^"
+<STR_OP> ::= "+"
+<CONST_INT> ::= <INTEGER>
+<CONST_STR> ::= <RAW_TEXT>
+; [iconstant(10)]
 ```
