@@ -2,16 +2,26 @@ from __future__ import annotations
 
 import logging
 from typing import TYPE_CHECKING, Iterable
-from random_parser.constants import IMPORT_INTERPOLATION_MARKER, IMPORT_ITPL_CLOSE_DELIMITER, IMPORT_ITPL_END, IMPORT_ITPL_OPEN_DELIMITER
+from random_parser.constants import GENERATOR_PARSER, IMPORT_INTERPOLATION_MARKER, IMPORT_ITPL_CLOSE_DELIMITER, IMPORT_ITPL_END, IMPORT_ITPL_OPEN_DELIMITER, RESOURCE_PARSER
+from random_parser.context import Context
 
 from random_parser.token_parser import TokenParser
 
 
 class ImportInterpolationTokenParser(TokenParser):
 
-    def __init__(self, filename: str, lines: Iterable[str], line_num: int, expression: str, char_num: int, token_num: int):
-        super().__init__(filename, lines, line_num, expression, char_num, token_num)
+    def __init__(self, parser: TokenParser, token_num: int):
+        super().__init__(parser, token_num=token_num)
         self.import_handle = None
+
+    def evaluate(self, context: Context):
+        import_ = context.imports_cache.get(self.import_handle)
+        if import_.parser_type == GENERATOR_PARSER:
+            return import_.parser.evaluate(context)
+        elif import_.parser_type == RESOURCE_PARSER:
+            return import_.parser.evaluate(context)
+        else:
+            raise ValueError(f'Got unsupported parser type: {import_.parser_type}')
 
     def parse(self):
         logging.debug(f'IISP processing line {self.line()} at char #{self.char_num}: "{self.char()}"')

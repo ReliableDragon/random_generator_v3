@@ -18,6 +18,7 @@ choice.
 
 # Formal Syntax
 ```
+; Whitespace is ignored when leading a line. Convention is to indent by 4 spaces for each level.
 <COMMENT> ::= ";" ; Not gonna include this everywhere. Anything on a line after a comment is ignored.
 <GENERATOR> ::= <HEADER> <CHOICE_BLOCK>
 <RESOURCE> ::= <HEADER> <INTERPOLATION_BLOCK>
@@ -31,6 +32,7 @@ choice.
 <CHOICE_BLOCK> ::= <CHOICE_EXPRESSION> <INTERPOLATION_BLOCKS>
 
 <CHOICE_EXPRESSION> ::= (<CHOICE_MARKER_FRAGMENTS> | <TEXT>) <NEWLINE>  ; i.e. N <INTERPOLATION_MARKER> interspersed throughout text, or plain text. Blank not currently allowed.
+; TODO: Consider finding a better name than "marker" for these. Something more like "clause".
 <CHOICE_MARKER_FRAGMENTS> ::= 1*([<TEXT>] <CHOICE_MARKER>) [<TEXT>]
 <CHOICE_MARKER> ::= <INTERPOLATION_MARKER> | <IMPORT_INTERPOLATION_MARKER>
 <INTERPOLATION_MARKER> ::= "$"
@@ -39,16 +41,15 @@ choice.
 <BRACKET_DELIMITED_IMPORT_HANDLE> ::= "{" <IMPORT_HANDLE> "}"
 
 <INTERPOLATION_BLOCKS> ::= N*(<INTERPOLATION_BLOCK>)  ; N equals the number of <INTERPOLATION_MARKER> in the <CHOICE_EXPRESSION>.
-<INTERPOLATION_BLOCK> ::= *(<WEIGHTED_CHOICE> <NEWLINE>) <INTERPOLATION_BLOCK_END> <NEWLINE>
-<WEIGHTED_CHOICE> ::= <PADDING> <INTEGER> [<SPACE> <CHOICE_VALUE>]  ; Empty choices are allowed.
-<CHOICE_VALUE> ::= (<TEXT> | <CHOICE_BLOCK>)
-<INTERPOLATION_BLOCK_END> ::= <PADDING> "$"
+<INTERPOLATION_BLOCK> ::= *(<WEIGHTED_CHOICE>) <INTERPOLATION_BLOCK_END>
+<WEIGHTED_CHOICE> ::= <INTEGER> [<SPACE> <WEIGHTED_CHOICE_VALUE>] <NEWLINE>; Empty choices are allowed.
+<WEIGHTED_CHOICE_VALUE> ::= (<TEXT> | <CHOICE_BLOCK>)
+<INTERPOLATION_BLOCK_END> ::= "$" <NEWLINE>
 
 <RAW_TEXT_LINE> ::= <RAW_TEXT> <NEWLINE>
 <TEXT> ::=  1*([<RAW_TEXT>] <COMMAND_EXPRESSION>) [<RAW_TEXT>] | <RAW_TEXT>
-<RAW_TEXT> ::= "[^\n]"
+<RAW_TEXT> ::= "[^\n$@#]"
 <NEWLINE> ::= "\n"
-<PADDING> ::= *" "  ; Convention is 4 spaces for each level of nesting.
 <INTEGER> ::= 1*[1234567890]
 <SPACE> ::= " "
 

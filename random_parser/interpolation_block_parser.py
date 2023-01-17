@@ -1,11 +1,15 @@
 
 import logging
+import random
 from typing import Dict, Iterable, Union
 
 from random_parser.base_parser import BaseParser
 from random_parser.choice_block_parser import ChoiceBlockParser
 from random_parser.constants import CHOICE_EXPRESSION_CONTROL_MARKERS, WEIGHTED_CHOICE_SEPARATOR, INTERPOLATION_BLOCK_END, INTERPOLATION_MARKER
+from random_parser.context import Context
+from random_parser.text_fragment_parser import TextFragmentParser
 from random_parser.weighted_choice_parser import WeightedChoiceParser
+from random_parser.weighted_choice_value_parser import WeightedChoiceValueParser
 
 
 class InterpolationBlockParser(BaseParser):
@@ -22,43 +26,57 @@ class InterpolationBlockParser(BaseParser):
     fragment_num: Which fragment is currently being parsed. Debugging purposes only."""
 
     def __init__(
-            self, filename: str, lines: Iterable[str],
-            line_num: int, block_num: int = None, choice_expression: str = None):
-        super().__init__(filename, lines, line_num)
+            self, parser: BaseParser, block_num: int = None, parent_choice_expression: str = None):
+        super().__init__(parser)
         self.weighted_choices = []  # Iterable[WeightedChoiceParser]
         self.block_num = block_num  # int
-        self.choice_expression = choice_expression  # Optiona[str]
+        self.parent_choice_expression = parent_choice_expression  # Optional[str]
 
     def __str__(self):
         # TODO: Actually code this.
-        return str(self.choice_expression)
+        return str(self.parent_choice_expression)
+
+    def randomly_generate_weighted_choice(self) -> WeightedChoiceValueParser:
+        total_weight= sum([wc.weight for wc in self.weighted_choices])
+        threshold= random.randint(1, total_weight)
+        i= -1  # Start at -1 to ensure loop condition evaluates properly at i=0.
+        weight_sum = 0
+        while weight_sum < threshold:
+            i += 1
+            weight_sum += self.weighted_choices[i].weight
+        choice = self.weighted_choices[i].choice_value
+        return choice
+
+    def evaluate(self, context: Context):
+        logging.debug(f'Evaluating interpolation block {self}')
+        return self.randomly_generate_weighted_choice().evaluate(context)
 
     def has_choice_expression(self):
-        return self.choice_expression is not None
+        return self.parent_choice_expression is not None
 
     def get_while_msg(self):
         if self.has_choice_expression():
-            return f'while parsing fragment #{self.block_num} needed for "{self.choice_expression}"'
+            return f'while parsing fragment #{self.block_num} needed for "{self.parent_choice_expression}"'
         else:
             return 'while parsing non-choice-block interpolation_block'
 
     def parse(self):
         token_num = 1
         while True:
+            logging.debug(f'Line #{self.get_line_num()}: {self.line()}')
             assert not self.is_finished(), self.err_msg(
                 f'Ran out of input {self.get_while_msg()}')
             assert self.line(), self.err_msg(
                 f'Got empty line {self.get_while_msg()}')
-            logging.debug(f'{self.line_num}: {self.line()}')
 
             # The dollar sign indicated the end of a subchoice block.
             if self.line() == INTERPOLATION_BLOCK_END:
-                logging.debug(f'Found end of interpolation block for interpolation block #{self.block_num} for choice expression "{self.choice_expression}" at line {self.get_line_num()}')
+                logging.debug(f'Found end of interpolation block for interpolation block #{self.block_num} for choice expression "{self.parent_choice_expression}" at line {self.get_line_num()}')
                 self.use_line()
                 return self
 
-            weighted_choice = WeightedChoiceParser(self.filename, self.lines, self.line_num, self.line(), 0, token_num)
+            weighted_choice = WeightedChoiceParser(self, 0, token_num)
             weighted_choice.parse()
-            self.line_num = weighted_choice.line_num
+            self.sync(weighted_choice)
             self.weighted_choices.append(weighted_choice)
             token_num += 1

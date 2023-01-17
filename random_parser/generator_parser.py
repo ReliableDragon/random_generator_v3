@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Iterable
 from random_parser.file_parser import FileParser
 from random_parser.imports_cache import ImportsCache
 from random_parser.choice_block_parser import ChoiceBlockParser
+from random_parser.base_parser import BaseParser
 
 
 class GeneratorParser(FileParser):
@@ -14,12 +15,16 @@ class GeneratorParser(FileParser):
         super().__init__(filename, lines, line_num, imports_cache)
         self.choice_block = None
 
+    def evaluate(self, context):
+        logging.debug(f'Evaluating...')
+        return self.choice_block.evaluate(context)
+
     def parse(self):
         super().parse()
 
         assert self.lines, self.err_msg('Generator did not contain an choice block')
-        self.choice_block = ChoiceBlockParser(self.filename, self.lines, self.line_num)
+        self.choice_block = ChoiceBlockParser(self)
         self.choice_block.parse()
-        self.line_num = self.choice_block.line_num
+        self.sync(self.choice_block)
 
         return self

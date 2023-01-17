@@ -39,15 +39,15 @@ def get_choice(length) -> Union[int, str]:
         except:
             pass
 
-def repl(generator: GeneratorEvaluator):
+def repl(parser: Parser):
     while True:
-        generations = generator.get_available_generations()
+        generations = parser.get_available_generations()
         for i, generation in enumerate(generations):
             print(f'{i+1}: {generation}')  # Add 1 so users see 1-indexed values
         choice = get_choice(len(generations))
         if choice == 'exit':
             break
-        generated = generator.evaluate(choice)
+        generated = parser.evaluate(choice)
         print(generated + '\n\n')
 
 def run(args: argparse.Namespace) -> None:
@@ -58,8 +58,7 @@ def run(args: argparse.Namespace) -> None:
         print('Running the random choice generator!')
         parser = Parser(args.generators, args.inputs)
         parser.parse(args.filter)
-        generator = GeneratorEvaluator(parser)
-        repl(generator)
+        repl(parser)
 
 
 if __name__ == '__main__':

@@ -1,3 +1,3 @@
 Command Test Generator
 
-My favorite number is #(constant(constant(constant(five))))!!!!!!!!!!
+My favorite number is #(constant(constant(constant(five)))), but I also like #(random(10, 20)) and to go #(cow())

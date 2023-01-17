@@ -9,7 +9,7 @@ class ImportsParser(BaseParser):
     """The ImportsParser parses imports."""
 
     def __init__(self, filename: str, lines: Iterable[str], line_num: int, imports_cache: ImportsCache):
-        super().__init__(filename, lines, line_num)
+        super().__init__(filename=filename, lines=lines, line_num=line_num)
         self.imports_cache = imports_cache
 
     def parse(self, import_type: str, import_handle: str, import_filename: str):
@@ -26,10 +26,10 @@ class ImportsParser(BaseParser):
         with open(filepath) as f:
             lines = f.read().split('\n')
             if import_type == GENERATOR_IMPORT_KEYWORD:
-                parser = generator_parser.GeneratorParser(self.filename, lines, 0, self)
+                parser = generator_parser.GeneratorParser(self.filename, lines, 0, self.imports_cache)
                 parser_type =  GENERATOR_PARSER
             else:
-                parser = resource_parser.ResourceParser(self.filename, lines, 0, self)
+                parser = resource_parser.ResourceParser(self.filename, lines, 0, self.imports_cache)
                 parser_type =  RESOURCE_PARSER
             parser.parse()
             self.imports_cache.store(import_handle, parser_type, parser)

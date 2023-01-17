@@ -1,81 +1,70 @@
 from dataclasses import dataclass
 import logging
 import re
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 
 from random_parser.base_parser import BaseParser
-from random_parser.constants import CHOICE_EXPRESSION_CONTROL_MARKERS, IMPORT_INTERPOLATION_MARKER, INTERPOLATION_MARKER
+from random_parser.choice_marker_parser import ChoiceMarkerParser
+from random_parser.constants import CHOICE_EXPRESSION_CONTROL_MARKERS, CHOICE_EXPRESSION_END, IMPORT_INTERPOLATION_MARKER, INTERPOLATION_MARKER
+from random_parser.context import Context
 from random_parser.control_marker import ControlMarker
 from random_parser.import_interpolation_token_parser import ImportInterpolationTokenParser
 from random_parser.interpolation_token_parser import InterpolationTokenParser
 from random_parser.text_fragment_parser import TextFragmentParser
+from random_parser.token_parser import TokenParser
+
+if TYPE_CHECKING:
+    from random_parser.interpolation_block_parser import InterpolationBlockParser
 
 
-class ChoiceExpressionParser(BaseParser):
+class ChoiceExpressionParser(TokenParser):
 
-    def __init__(self, filename: str, lines: Iterable[str], line_num: int, choice_expression: str):
-        super().__init__(filename, lines, line_num)
-        self.choice_expression = choice_expression
-        self.fragments = []  # Iterable[Union[TextFragmentParser, InterpolationTokenParser, ImportInterpolationTokenParser]]
-        self.num_interpolation_fragments = 0
-        self.num_import_itpl_fragments = 0
-        self.num_text_fragments = 0
+    def __init__(self, parser: BaseParser, char_num: int):
+        super().__init__(base_parser=parser, char_num=char_num)
+        self.fragments = []  # Iterable[Union[TextFragmentParser, ChoiceMarkerParser]]
+        self.fragment_counts = {
+            'interpolation': 0,
+            'import': 0,
+            'text': 0,
+            'marker': 0,
+        }
 
-    def print(self, indent=0, top_level=False):
-        rep = ''
-        if top_level:
-            rep += super().print(indent)
-        rep += ' ' * indent + 'choice_expression: ' + self.choice_expression + '\n'
-        rep += ' ' * indent + 'fragments: ' + str(self.fragments) + '\n'
-        rep += ' ' * indent + 'num_interpolation_fragments: ' + \
-            str(self.num_interpolation_fragments) + '\n'
-        rep += ' ' * indent + 'num_import_itpl_fragments: ' + \
-            str(self.num_import_itpl_fragments) + '\n'
-        return rep
+    def evaluate(self, context: Context, interpolation_blocks: Iterable['InterpolationBlockParser']):
+        generation = ''
+        i = 0
+        for fragment in self.fragments:
+            logging.debug(generation)
+            if isinstance(fragment, TextFragmentParser):
+                generation += fragment.evaluate(context)
+            elif isinstance(fragment, ChoiceMarkerParser):
+                generation += fragment.evaluate(context, interpolation_blocks)
+            else:
+                raise ValueError(f'Unsupported fragment received: {fragment}')
+
+        return generation
 
     def _get_control_markers(self):
         return [ControlMarker(c, i) for i, c in enumerate(
-            self.choice_expression) if c in CHOICE_EXPRESSION_CONTROL_MARKERS]
+            self.expression) if c in CHOICE_EXPRESSION_CONTROL_MARKERS]
+
+    def num_interpolation_fragments(self):
+        return self.fragment_counts['interpolation']
 
     def parse(self):
-        control_markers = self._get_control_markers()
-        i = 0
-        for n, marker in enumerate(control_markers):
-            logging.debug(
-                f'Parsing marker {marker.marker} (#{n+1} of {len(control_markers)}) for choice expression')
-            assert marker.marker in CHOICE_EXPRESSION_CONTROL_MARKERS, self.err_msg(
-                f'Got invalid marker {marker}')
-            self.num_text_fragments += 1
-            text_fragment = TextFragmentParser(self.filename, self.lines, self.line_num, self.choice_expression[i:marker.index], 0, self.num_text_fragments)
+        logging.debug(f'Parsing choice expression from: {self.line()[self.char_num:]}')
+        while not self.is_eol():
+            self.fragment_counts['text'] += 1
+            text_fragment = TextFragmentParser(self, token_num=self.fragment_counts['text'])
             text_fragment.parse()
-            self.fragments.append(text_fragment)
-            i = marker.index
-
-            if marker.marker == INTERPOLATION_MARKER:
-                clazz = InterpolationTokenParser
-                # Set fragment_num first, as fragment_num is 0-indexed, while the num_*_fragments
-                # fields are 1-based counting. This order saves having to subtract one.
-                fragment_num = self.num_interpolation_fragments
-                self.num_interpolation_fragments += 1
-            elif marker.marker == IMPORT_INTERPOLATION_MARKER:
-                clazz = ImportInterpolationTokenParser
-                fragment_num = self.num_import_itpl_fragments
-                self.num_import_itpl_fragments += 1
-
-            symbol_parser = clazz(
-                self.filename, self.lines, self.line_num, self.choice_expression, i, fragment_num)
-            symbol_parser.parse()
-            i = symbol_parser.char_num
-
-            logging.info(f'Finished parsing fragment: {symbol_parser}')
-            self.fragments.append(symbol_parser)
-
-        if i != len(self.choice_expression):
-            self.num_text_fragments += 1
-            text_fragment = TextFragmentParser(self.filename, self.lines, self.line_num, self.choice_expression[i:], 0, self.num_text_fragments)
-            text_fragment.parse()
+            self.sync(text_fragment)
             self.fragments.append(text_fragment)
 
-        self.use_line()
+            if not self.is_eol() and self.char() in CHOICE_EXPRESSION_CONTROL_MARKERS:
+                self.fragment_counts['marker'] += 1
+                choice_marker = ChoiceMarkerParser(self, self.fragment_counts)
+                choice_marker.parse()
+                self.sync(choice_marker)
+                self.fragments.append(choice_marker)
+        self.use_line()  # Consume choice expression line
         return self

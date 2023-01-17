@@ -26,5 +26,6 @@ class ImportsCache():
     def list_imports(self):
         return [i.import_handle for i in self.imports.values()]
 
-import random_parser.generator_parser as generator_parser
-import random_parser.resource_parser as resource_parser
+if TYPE_CHECKING:
+    import random_parser.generator_parser as generator_parser
+    import random_parser.resource_parser as resource_parser

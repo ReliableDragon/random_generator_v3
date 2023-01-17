@@ -4,27 +4,31 @@ from typing import Iterable
 
 from random_parser.utils import generate_err_msg
 
+# Abstract
+
 
 class BaseParser():
     """Base class for parsers.
-    
+
     Attributes:
     filename: String filename indicating the name (not filepath) of the file being processed.
     lines: List containing all the lines to process.
     line_num: 0-indexed line number that is currently being processed."""
 
-    # TODO: Add init from another BaseParser.
-    def __init__(self, filename: str, lines: Iterable[str], line_num: int):
-        self.filename = filename
-        self.lines = lines
-        self.line_num = line_num
-
-    def print(self, indent = 0):
-        rep = ''
-        rep += ' ' * indent + 'filename: ' + self.filename + '\n'
-        rep += ' ' * indent + 'line_num: ' + str(self.line_num) + '\n'
-        rep += ' ' * indent + 'lines:' + '\n' + '\n'.join([' ' * indent + str(l) for l in self.lines]) + '\n'
-        return rep
+    def __init__(
+            self, parser: 'BaseParser' = None, filename: str = None, lines: Iterable[str] = None,
+            line_num: int = None):
+        if parser:
+            self.filename = parser.filename
+            self.lines = parser.lines
+            self.line_num = parser.line_num
+        else:
+            self.filename = filename
+            self.lines = lines
+            self.line_num = line_num
+        assert self.filename, 'Filename was not initialized!'
+        assert self.lines, f'Lines was not initialized for file {self.filename}!'
+        assert self.line_num is not None, f'Line num was not initialized for file {self.filename}!'
 
     def line(self):
         try:
@@ -43,6 +47,12 @@ class BaseParser():
 
     def is_finished(self):
         return self.line_num == len(self.lines)
+
+    def context(self):
+        return self.line()[:25]
+
+    def sync(self, other):
+        self.line_num = other.line_num
 
     def err_msg(self, msg):
         if self.is_finished():

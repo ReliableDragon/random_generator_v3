@@ -7,11 +7,11 @@ from random_parser.constants import GENERATOR_IMPORT_KEYWORD, IMPORT_DATA_SEPARA
 
 from random_parser.utils import generate_err_msg
 
-
+# Abstract
 class FileParser(BaseParser):
 
     def __init__(self, filename: str, lines: Iterable[str], line_num: int, imports_cache: ImportsCache):
-        super().__init__(filename, lines, line_num)
+        super().__init__(filename=filename, lines=lines, line_num=line_num)
         self.name = None
         self.imports_cache = imports_cache
 

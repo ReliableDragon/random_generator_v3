@@ -1,5 +1,6 @@
 import logging
 import os
+from random_parser.context import Context
 
 from random_parser.generator_parser import GeneratorParser
 
@@ -29,6 +30,18 @@ class Parser():
         self.generators_folder = generators_folder if generators_folder else r'generators/'
         self.resources_folder = resources_folder if resources_folder else r'generators/resources/'
         self.imports_cache = ImportsCache(self.generators_folder, self.resources_folder)
+
+    def get_available_generations(self, generator_filter: str = None) -> Iterable[str]:
+        if not generator_filter:
+            return [p.name for p in self.top_level_generators]
+        else:
+            return [generator_filter] if generator_filter in self.top_level_generators else []
+
+    def evaluate(self, choice: int = 0) -> str:
+        generator = self.top_level_generators[choice]
+        context = Context(self.imports_cache, {})
+        print(f'Evaluating {generator.filename}')
+        return generator.evaluate(context)
 
     def parse(self, generator_filter: str = None) -> None:
         self.parse_top_level_generators(generator_filter)
