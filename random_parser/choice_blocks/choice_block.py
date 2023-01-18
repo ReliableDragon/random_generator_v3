@@ -4,7 +4,7 @@ from typing import Iterable
 
 
 from random_parser.base_parser import BaseParser
-from random_parser.choice_expression import ChoiceExpressionParser
+from random_parser.choice_blocks.choice_expression import ChoiceExpressionParser
 from random_parser.constants import GENERATOR_PARSER, RESOURCE_PARSER
 from random_parser.context import Context
 
@@ -53,4 +53,4 @@ class ChoiceBlockParser(BaseParser):
 
 
 # Delay import to prevent circular dependencies.
-import random_parser.interpolation_block as ibp
+import random_parser.interpolation_blocks.interpolation_block as ibp

@@ -2,8 +2,6 @@
 import logging
 from typing import Iterable
 
-from random_parser.utils import generate_err_msg
-
 # Abstract
 
 

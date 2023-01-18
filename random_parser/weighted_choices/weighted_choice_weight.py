@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Iterable
 from random_parser.constants import WEIGHTED_CHOICE_OPEN_DELIMITER, WEIGHTED_CHOICE_CLOSE_DELIMITER, WEIGHTED_CHOICE_END, WEIGHTED_CHOICE_SEPARATOR
 from random_parser.context import Context
 from random_parser.token_parser import TokenParser
-from random_parser.choice_block import ChoiceBlockParser
-from random_parser.command import CommandParser
+from random_parser.choice_blocks.choice_block import ChoiceBlockParser
+from random_parser.commands.command import CommandParser
 
 class WeightedChoiceWeightParser(TokenParser):
 

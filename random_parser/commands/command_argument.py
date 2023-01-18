@@ -74,4 +74,4 @@ class CommandArgumentParser(TokenParser):
         return self
 
         
-from random_parser.command import CommandParser
+from random_parser.commands.command import CommandParser

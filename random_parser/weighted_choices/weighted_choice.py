@@ -4,8 +4,8 @@ from random_parser.constants import CHOICE_EXPRESSION_CONTROL_MARKERS, INTERPOLA
 from random_parser.context import Context
 from random_parser.token_parser import TokenParser
 from random_parser.base_parser import BaseParser
-from random_parser.weighted_choice_value import WeightedChoiceValueParser
-from random_parser.weighted_choice_weight import WeightedChoiceWeightParser
+from random_parser.weighted_choices.weighted_choice_value import WeightedChoiceValueParser
+from random_parser.weighted_choices.weighted_choice_weight import WeightedChoiceWeightParser
 
 
 class WeightedChoiceParser(TokenParser):

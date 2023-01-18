@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import logging
 from typing import TYPE_CHECKING, Iterable, Union
-from random_parser.commands import Commands
+from random_parser.commands.commands import Commands
 from random_parser.constants import COMMAND_ARGUMENT_SEPARATOR, COMMAND_EXPRESSION_CLOSE_DELIMITER, COMMAND_EXPRESSION_MARKER, COMMAND_EXPRESSION_OPEN_DELIMITER, IMPORT_INTERPOLATION_MARKER, IMPORT_ITPL_CLOSE_DELIMITER, IMPORT_ITPL_END, IMPORT_ITPL_OPEN_DELIMITER
 from random_parser.context import Context
 
@@ -99,4 +99,4 @@ class CommandParser(TokenParser):
         self.use_char()  # Consume trailing ")"
         return self
 
-from random_parser.command_argument import CommandArgumentParser
+from random_parser.commands.command_argument import CommandArgumentParser

@@ -5,8 +5,6 @@ from typing import Iterable, TYPE_CHECKING
 from random_parser.base_parser import BaseParser
 from random_parser.constants import GENERATOR_IMPORT_KEYWORD, IMPORT_DATA_SEPARATOR, IMPORT_LINE_SEPARATOR, RESOURCE_IMPORT_KEYWORD
 
-from random_parser.utils import generate_err_msg
-
 # Abstract
 class FileParser(BaseParser):
 

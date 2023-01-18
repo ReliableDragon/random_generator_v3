@@ -1,0 +1,10 @@
+Expression Test
+
+pass
+;I am expression test number $.
+;    [100+iconstant(100)] 200
+;    [10*10] 100
+;    [100/100] 1
+;    [1000-iconstant(1000)-1000] -1000
+;    [1**100] #(constant(just) + constant(one))
+;    $

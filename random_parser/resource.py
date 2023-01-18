@@ -3,11 +3,10 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Iterable
 from random_parser.context import Context
-from random_parser.utils import generate_err_msg
 
 from random_parser.file_parser import FileParser
 from random_parser.imports_cache import ImportsCache
-from random_parser.interpolation_block import InterpolationBlockParser
+from random_parser.interpolation_blocks.interpolation_block import InterpolationBlockParser
 
 
 class ResourceParser(FileParser):

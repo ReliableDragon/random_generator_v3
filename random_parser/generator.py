@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Iterable
 
 from random_parser.file_parser import FileParser
 from random_parser.imports_cache import ImportsCache
-from random_parser.choice_block import ChoiceBlockParser
+from random_parser.choice_blocks.choice_block import ChoiceBlockParser
 
 
 class GeneratorParser(FileParser):

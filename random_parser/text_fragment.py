@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import logging
 from typing import TYPE_CHECKING, Iterable
-from random_parser.command_expression import CommandExpressionParser
+from random_parser.commands.command_expression import CommandExpressionParser
 from random_parser.constants import CHOICE_EXPRESSION_CONTROL_MARKERS, CHOICE_EXPRESSION_END, COMMAND_EXPRESSION_MARKER, IMPORT_INTERPOLATION_MARKER, IMPORT_ITPL_CLOSE_DELIMITER, IMPORT_ITPL_END, IMPORT_ITPL_OPEN_DELIMITER, TEXT_EXPRESSION_CONTROL_MARKERS
 from random_parser.context import Context
 

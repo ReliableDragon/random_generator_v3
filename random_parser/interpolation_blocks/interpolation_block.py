@@ -6,8 +6,8 @@ from typing import Dict, Iterable, Union
 from random_parser.base_parser import BaseParser
 from random_parser.constants import CHOICE_EXPRESSION_CONTROL_MARKERS, WEIGHTED_CHOICE_SEPARATOR, INTERPOLATION_BLOCK_END, INTERPOLATION_MARKER
 from random_parser.context import Context
-from random_parser.weighted_choice import WeightedChoiceParser
-from random_parser.weighted_choice_value import WeightedChoiceValueParser
+from random_parser.weighted_choices.weighted_choice import WeightedChoiceParser
+from random_parser.weighted_choices.weighted_choice_value import WeightedChoiceValueParser
 
 
 class InterpolationBlockParser(BaseParser):
